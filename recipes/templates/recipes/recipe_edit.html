@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block content %}
+    <form method="POST" class="post-form">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="save btn btn-primary">Save</button>
+    </form>
+    {% if title != "New Recipe" %}
+    <a href="/recipe/{{ recipe.id }}/delete/"><button class="btn btn-danger">Delete Recipe</button></a>
+    {% endif %}
+{% endblock %}
