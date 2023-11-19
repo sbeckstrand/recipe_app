@@ -11,4 +11,6 @@ urlpatterns = [
     path('recipe/<int:pk>/edit/', views.recipe_edit, name='recipe_edit'),
     path('recipe/<int:pk>/delete/', views.recipe_delete, name='recipe_delete'),
     path('search/', views.recipe_search, name='recipe_search'),
+    path('login/', views.login_view, name='login'),
+    path('logout/', views.logout_view, name='logout'),
 ]
