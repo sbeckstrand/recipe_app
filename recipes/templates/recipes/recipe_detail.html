@@ -4,5 +4,7 @@
     <p>{{ recipe.description }}</p>
     <p>{{ recipe.ingredients|linebreaks }}</p>
     <p>{{ recipe.instructions }}</p>
+    {% if user.is_authenticated %}
     <a href="edit/"><button class="btn btn-warning">Edit Recipe</button></a>
+    {% endif %}
 {% endblock %}
