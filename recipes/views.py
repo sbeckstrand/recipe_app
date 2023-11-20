@@ -1,10 +1,12 @@
 # recipes/views.py
 
+import json
+from django.forms import ValidationError
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from .models import Recipe
-from .forms import RecipeForm, LoginForm
+from .forms import RecipeForm, LoginForm, IngredientForm
 
 
 def index(request):
@@ -38,7 +40,8 @@ def recipe_new(request):
     
     context = {
         'form': form,
-        'title': "New Recipe"
+        'title': "New Recipe",
+        'sections': ['ingredient', 'instruction']
     }
     return render(request, 'recipes/recipe_edit.html', context)
 
@@ -57,7 +60,8 @@ def recipe_edit(request, pk):
     context = {
         'recipe': recipe,
         'form': form,
-        'title': f'{ recipe.title } - Edit'
+        'title': f'{ recipe.title } - Edit',
+        'sections': ['ingredient', 'instruction']
     }
     return render(request, 'recipes/recipe_edit.html', context)
 
@@ -104,3 +108,36 @@ def logout_view(request):
     logout(request)
     # Redirect to a specific page after logout (e.g., home page)
     return redirect('/')  # Replace 'home' with your desired URL name
+
+def test_view(request):
+    if request.method == 'POST':
+        # Process the submitted form data here
+        ingredient_data = {}
+        count = 0
+        for key, val  in request.POST.items():
+            if 'dynamic-field-ingredient' in key:
+                ingredient_data[count] = val
+                count += 1
+        ingredient_json = json.dumps(ingredient_data)
+       
+
+
+        try:
+            json.loads(ingredient_json)
+            valid = True
+        except ValueError as e:
+            valid = False
+    
+        if valid: 
+            ingredients = ingredient_json
+            return redirect("/recipes/")
+
+        return redirect("/")
+        # Do something with the form data
+        # Redirect or render a response
+    else:
+        # Render the initial form for GET requests
+        context = {
+            'sections': ['ingredient', 'instruction']
+        }
+        return render(request, 'recipe_form.html', context)
