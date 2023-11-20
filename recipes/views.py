@@ -11,13 +11,19 @@ def index(request):
     recipes = Recipe.objects.order_by('-pk')[:5]
     return render(request, 'index.html', {'recipes': recipes, 'title': 'Home'})
 
-def recipe_list(request):
-    recipes = Recipe.objects.all()
-    return render(request, 'recipes/recipe_list.html', {'recipes': recipes, 'title': 'Recipes'})
+def recipe_all(request):
+    recipes = Recipe.objects.order_by('-pk').all()
+    return render(request, 'recipes/recipe_all.html', {'recipes': recipes, 'title': 'Recipes'})
 
 def recipe_detail(request, pk):
     recipe = get_object_or_404(Recipe, pk=pk)
-    return render(request, 'recipes/recipe_detail.html', {'recipe': recipe, 'title': recipe.title})
+    context = {
+        'recipe': recipe,
+        'title': recipe.title,
+        'ingredients': recipe.ingredients.split('\n'),
+        'instructions': recipe.instructions.split('\n')
+    }
+    return render(request, 'recipes/recipe_detail.html', context)
 
 @login_required
 def recipe_new(request):
@@ -59,7 +65,7 @@ def recipe_edit(request, pk):
 def recipe_delete(request, pk):
     recipe = get_object_or_404(Recipe, pk=pk)
     recipe.delete()
-    return redirect('recipe_list')
+    return redirect('recipe_all')
 
 def recipe_search(request):
     if request.method == 'GET':
@@ -76,7 +82,7 @@ def recipe_search(request):
             'title': 'Search Results'
         }
         
-        return render(request, 'recipes/recipe_list.html', context)
+        return render(request, 'recipes/recipe_all.html', context)
     
 def login_view(request):
     if request.method == 'POST':

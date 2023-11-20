@@ -1,14 +1,11 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Login</title>
-</head>
-<body>
-    <h2>Login</h2>
-    <form method="post">
+{% extends "base.html" %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+    <h1 class="py-2">Login</h1>
+    <form method="POST" class="form mb-3">
         {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit">Login</button>
+        {{ form|crispy }}
+        <button type="submit" class="btn btn-primary">Login</button>
     </form>
-</body>
-</html>
+{% endblock %}
