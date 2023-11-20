@@ -1,14 +1,7 @@
-{% extends "base.html" %}
-{% block content %}
-{% if title == "Search Results" %}
-    <h2>Search Results</h1>
-    {% if recipes|length == 0 %}
-        <p>No results found.</p>
-    {% endif %}
-{% else %}
-    <h2>Recipes</h1>
-{% endif %}
-{% for recipe in recipes %}
-    <li><a href="{% url 'recipe_detail' pk=recipe.pk %}">{{ recipe.title }}</a></li>
-{% endfor %}
-{% endblock %}
+<ul class="list-group">
+    {% for recipe in recipes %}
+        <li class="list-group-item">
+            <a class="link-body-emphasis link-offset-2 link-underline-opacity-25 link-underline-opacity-75-hover" href="{% url 'recipe_detail' pk=recipe.pk %}">{{ recipe.title }}</a>
+        </li>
+    {% endfor %}
+</ul>

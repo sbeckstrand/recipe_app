@@ -1,9 +1,28 @@
 {% extends "base.html" %}
 {% block content %}
-    <h1>{{ recipe.title }}</h1>
-    <p>{{ recipe.description }}</p>
-    <p>{{ recipe.ingredients|linebreaks }}</p>
-    <p>{{ recipe.instructions }}</p>
+    <h2 class="py-2">{{ recipe.title }}</h2>
+    
+    <h5>Description</h5>
+    <p>{{ recipe.description|linebreaks }}</p>
+    
+    <h5 class="py-2">Ingredients</h5>
+    <ul class="list-group mb-3">
+        {% for ingredient in ingredients %}
+            <li class="list-group-item">
+                {{ ingredient }}
+            </li>
+        {% endfor %}
+    </ul>
+    
+    <h5 class="py-2">Instructions</h5>
+    <ul class="list-group mb-3">
+        {% for instruction in instructions %}
+            <li class="list-group-item">
+                {{ instruction }}
+            </li>
+        {% endfor %}
+    </ul>
+    
     {% if user.is_authenticated %}
     <a href="edit/"><button class="btn btn-warning">Edit Recipe</button></a>
     {% endif %}
