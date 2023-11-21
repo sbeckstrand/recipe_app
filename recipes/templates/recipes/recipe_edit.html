@@ -2,18 +2,126 @@
 {% load crispy_forms_tags %}
 
 {% block content %}
-    {% if not recipe %}
     <h2 class="py-2">{{ title }}</h2>
-    {% else %}
-    <h2 class="py-2">{{ recipe.title }}</h2>
-    {% endif %}
-    <form method="POST" class="post-form mb-3">
+    <form id="dynamic-form" method="post">
         {% csrf_token %}
-        {{ form|crispy }}
-        <button type="submit" class="save btn btn-primary">Save</button>
-        {% if recipe %}
-        <a href="/recipe/{{ recipe.id }}/delete/"><button class="btn btn-danger">Delete Recipe</button></a>
-        {% endif %}
+        {{ form.title|as_crispy_field }}
+        {{ form.description|as_crispy_field }}
+        
+        {% for section in sections %}
+        <div id="{{ section }}-control" class="mb-3">
+            <div id="{{ section }}-formset">
+                <!-- Form fields will be added and removed dynamically here -->
+                <!-- Initially, you can have a single input field -->
+                <label class="form-label requiredField" for="id_dynamic-fied-{{ section }}">{{ section|title }}s</label>
+                
+                {% if section == 'ingredient' %}
+                    {% if ingredients %}
+                        {% for key, ingredient_dict in ingredients.items %}
+                        <div class="input-group mb-1">
+                            <input class="textinput form-control w-50" value="{{ ingredient_dict.ingredient }}" type="text" name="dynamic-field-{{ section }}-{{ key }}" required>
+                            <input class="textinput form-control" value="{{ ingredient_dict.measurement }}" type="text" name="dynamic-field-measurement-{{ key }}" required>
+                            <button type="button" class="remove-field-{{ section }} btn btn-danger">Remove</button>
+                        </div> 
+                        {% endfor %}
+                    {% else %}
+                    <div class="input-group mb-1">
+                        <input class="textinput form-control w-50" type="text" name="dynamic-field-{{ section }}-0" required>
+                        <input class="textinput form-control" type="text" name="dynamic-field-measurement-0" required>
+                        <button type="button" class="remove-field-{{ section }} btn btn-danger">Remove</button>
+                    </div>
+                    {% endif %}
+                {% endif %}
+                {% if section == 'instruction' %}
+                    {% if instructions %}
+                        {% for key, instruction in instructions.items %}
+                        <div class="input-group mb-1">
+                            <textarea class="textarea form-control" rows="3" type="text" name="dynamic-field-{{ section }}-{{ key }}" required>{{ instruction.instruction }}</textarea>
+                            <button type="button" class="remove-field-{{ section }} btn btn-danger">Remove</button>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                    <div class="input-group mb-1">
+                        <textarea class="textarea form-control" rows="3" type="text" name="dynamic-field-{{ section }}-0" required></textarea>
+                        <button type="button" class="remove-field-{{ section }} btn btn-danger">Remove</button>
+                    </div>
+                    {% endif %}
+                {% endif %}
+            </div>
+            <button type="button" class="add-field-{{ section }} btn btn-success">Add {{ section|title }}</button>
+        </div>
+        {% endfor %}
+        <button class="btn btn-primary" type="submit">Submit</button>
     </form>
+
+    {% if recipe %}
+    <a href="{% url 'recipe_detail' pk=recipe.pk %}">
+        <button class="btn btn-warning my-2" type="submit">Cancel</button>
+    </a>
+    {% else %}
+        <button class="btn btn-warning my-2" type="submit" onClick="javascript:history.go(-1);">Cancel</button>
+    {% endif %}
     
+    <script type="text/javascript">
+    document.addEventListener("DOMContentLoaded", function() {
+        
+        {% for section in sections %}
+        const {{ section }}_formset = document.getElementById('{{ section }}-formset');
+        const {{ section }}_control = document.getElementById('{{ section }}-control');
+        {% if section == 'ingredient' %}
+            {% if ingredient_count %}
+            let fieldCountIngredient = {{ ingredient_count }} + 2;
+            {% else %}
+            let fieldCountIngredient = 1;
+            {% endif %}
+        {% endif %}
+        {% if section == 'instruction' %}
+            {% if instruction_count %}
+            let fieldCountInstruction = {{ instruction_count }} + 2;
+            {% else %}
+            let fieldCountInstruction = 1;
+            {% endif %}
+        {% endif %}
+    
+        // Function to add a new input field
+        function addField{{ section|title }}() {
+            const fieldDiv = document.createElement('div');
+            fieldDiv.classList.add("input-group")
+            fieldDiv.classList.add("mb-1")
+            fieldDiv.innerHTML = `
+                    {% if section == 'ingredient' %}
+                    <input class="textinput form-control w-50" type="text" name="dynamic-field-{{ section }}-${fieldCount{{section|title}}}" required>
+                    <input class="textinput form-control" type="text" name="dynamic-field-measurement-${fieldCount{{section|title}}}" required>
+                    {% endif %}
+                    {% if section == 'instruction' %}
+                    <textarea class="textarea form-control" rows="3" type="text" name="dynamic-field-{{ section }}-${fieldCount{{section|title}}}" required></textarea>
+                    {% endif %}
+                    <button type="button" class="remove-field-{{ section }} btn btn-danger">Remove</button>
+            `;
+            {{ section }}_formset.appendChild(fieldDiv);
+            fieldCount{{ section|title }}++;
+        }
+    
+        // Function to remove the clicked input field
+        function removeField{{ section|title }}(event) {
+            const fieldDiv = event.target.parentElement;
+            {{ section }}_formset.removeChild(fieldDiv);
+        }
+    
+        // Event listener to add a new field when "Add Field" button is clicked
+        {{ section}}_formset.addEventListener('click', function(event) {
+            if (event.target.classList.contains('remove-field-{{ section }}')) {
+                removeField{{ section|title }}(event);
+            }
+        });
+    
+        {{ section }}_control.addEventListener('click', function(event) {
+            if (event.target.classList.contains('add-field-{{ section }}')) {
+                addField{{ section|title }}();
+            }
+        })
+        {% endfor %}   
+    });
+    </script>
 {% endblock %}
+
