@@ -1,18 +1,30 @@
-## Beckstrand Recipe App
+# Recipe App
 
 Django based web app used to store and manage recipes
 
-## Deployment Steps
+## Deployment 
 
+### Prerequisits
+
+```
+Docker
+Docker Compose
+```
 ### Clone Repo
 
-### Created Virtual Environment with Necessary Packages
+```
+git clone git@github.com:sbeckstrand/recipe_app.git
+cd recipe_app
+```
 
-```pipenv install```
-
-### Run Application
+### Run the application
 
 ```
-pipenv shell
-python manage.py runvserver
+docker-compose up -d
 ```
+
+## Management
+
+When the container is deployed, a default user is created with the credentials `admin|admin`
+
+To update the password of this user or to create additional users, you can utilize the Django admin panel at `/admin`
