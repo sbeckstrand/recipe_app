@@ -4,7 +4,7 @@ Django based web app used to store and manage recipes
 
 ## Deployment 
 
-### Prerequisits
+### Prerequisites
 
 ```
 Docker
