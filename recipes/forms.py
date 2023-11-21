@@ -9,10 +9,11 @@ class RecipeForm(forms.ModelForm):
 
     class Meta:
         model = Recipe
-        fields = ('title', 'description', 'ingredients', 'instructions')
+        fields = ('title', 'description')
 
-class IngredientForm(forms.Form):
-    ingredient = forms.CharField(max_length=100, label="Ingredient")
+        widgets = {
+            'description': forms.Textarea(attrs={'rows': 4}),
+        }
 
 class LoginForm(AuthenticationForm):
     username = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Username'}))

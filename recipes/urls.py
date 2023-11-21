@@ -13,5 +13,4 @@ urlpatterns = [
     path('search/', views.recipe_search, name='recipe_search'),
     path('login/', views.login_view, name='login'),
     path('logout/', views.logout_view, name='logout'),
-    path('test/', views.test_view, name='test')
 ]

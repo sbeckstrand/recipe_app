@@ -6,24 +6,31 @@
     <p>{{ recipe.description|linebreaks }}</p>
     
     <h5 class="py-2">Ingredients</h5>
-    <ul class="list-group mb-3">
-        {% for ingredient in ingredients %}
-            <li class="list-group-item">
-                {{ ingredient }}
-            </li>
-        {% endfor %}
+    {% for key, ingredient_dict in ingredients.items %}
+    <ul class="list-group list-group-horizontal w-100">
+        <li class="list-group-item w-75">
+            {{ ingredient_dict.ingredient}}
+        </li>
+        <li class="list-group-item w-25">
+            {{ ingredient_dict.measurement }}
+        </li>
     </ul>
+    {% endfor %}
     
     <h5 class="py-2">Instructions</h5>
     <ul class="list-group mb-3">
-        {% for instruction in instructions %}
+        {% for key, instruction in instructions.items %}
             <li class="list-group-item">
-                {{ instruction }}
+                {{ instruction.instruction }}
             </li>
         {% endfor %}
     </ul>
     
     {% if user.is_authenticated %}
     <a href="edit/"><button class="btn btn-warning">Edit Recipe</button></a>
+    {% endif %}
+
+    {% if user.is_authenticated %}
+    <a href="delete/"><button class="btn btn-danger">Delete Recipe</button></a>
     {% endif %}
 {% endblock %}
