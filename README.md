@@ -17,6 +17,20 @@ git clone git@github.com:sbeckstrand/recipe_app.git
 cd recipe_app
 ```
 
+### Update environment variables
+
+```
+cp .env.sample .env
+```
+
+Next, update the .env file to have a valid Django secret key and domain name.
+
+If necessary, a new Django secret key can be generated (assuming you have python3 and django installed) by running the following: 
+
+```
+python3 -c 'from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())'
+```
+
 ### Run the application
 
 ```
