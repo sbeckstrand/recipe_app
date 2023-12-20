@@ -6,6 +6,8 @@
     {% if recipes|length == 0 %}
         <p>No results found.</p>
     {% endif %}
+{% else %}
+    <h2 class="pt-3">{{ title }}</h2>
 {% endif %}
 {% include 'recipes/recipe_list.html' %}
 {% endblock %}
