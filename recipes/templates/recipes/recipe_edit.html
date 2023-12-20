@@ -10,22 +10,22 @@
         
         {% for section in sections %}
         <div id="{{ section }}-control" class="mb-3">
+            <label class="form-label">{{ section|title }}s</label>
             <div id="{{ section }}-formset">
                 <!-- Form fields will be added and removed dynamically here -->
                 <!-- Initially, you can have a single input field -->
-                <label class="form-label requiredField" for="id_dynamic-fied-{{ section }}">{{ section|title }}s</label>
                 
                 {% if section == 'ingredient' %}
                     {% if ingredients %}
                         {% for key, ingredient_dict in ingredients.items %}
-                        <div class="input-group mb-1">
+                        <div class="input-group mb-1 ingredient-group">
                             <input class="textinput form-control w-50" value="{{ ingredient_dict.ingredient }}" type="text" name="dynamic-field-{{ section }}-{{ key }}" required>
                             <input class="textinput form-control" value="{{ ingredient_dict.measurement }}" type="text" name="dynamic-field-measurement-{{ key }}" required>
                             <button type="button" class="remove-field-{{ section }} btn btn-danger">Remove</button>
                         </div> 
                         {% endfor %}
                     {% else %}
-                    <div class="input-group mb-1">
+                    <div class="input-group mb-1 ingredient-group">
                         <input class="textinput form-control w-50" type="text" name="dynamic-field-{{ section }}-0" required>
                         <input class="textinput form-control" type="text" name="dynamic-field-measurement-0" required>
                         <button type="button" class="remove-field-{{ section }} btn btn-danger">Remove</button>
@@ -35,13 +35,13 @@
                 {% if section == 'instruction' %}
                     {% if instructions %}
                         {% for key, instruction in instructions.items %}
-                        <div class="input-group mb-1">
+                        <div class="input-group mb-1 instruction-group">
                             <textarea class="textarea form-control" rows="3" type="text" name="dynamic-field-{{ section }}-{{ key }}" required>{{ instruction.instruction }}</textarea>
                             <button type="button" class="remove-field-{{ section }} btn btn-danger">Remove</button>
                         </div>
                         {% endfor %}
                     {% else %}
-                    <div class="input-group mb-1">
+                    <div class="input-group mb-1 instruction-group">
                         <textarea class="textarea form-control" rows="3" type="text" name="dynamic-field-{{ section }}-0" required></textarea>
                         <button type="button" class="remove-field-{{ section }} btn btn-danger">Remove</button>
                     </div>
@@ -63,6 +63,19 @@
     {% endif %}
     
     <script type="text/javascript">
+    {% for section in sections %}
+    const {{ section }}Fields = document.getElementById('{{ section }}-formset');
+    new Sortable({{ section }}Fields, {
+        handle: '.{{ section }}-group', // Define the handle for dragging
+        animation: 450,
+        onEnd: function (evt) {
+            // Perform actions after drag and drop (e.g., update order)
+            const fieldOrder = Array.from({{ section }}Fields.children)
+                .map((item) => item.dataset.fieldId); // Get field IDs in the new order
+        }
+    });
+    {% endfor %}
+
     document.addEventListener("DOMContentLoaded", function() {
         
         {% for section in sections %}
@@ -86,6 +99,7 @@
         // Function to add a new input field
         function addField{{ section|title }}() {
             const fieldDiv = document.createElement('div');
+            fieldDiv.classList.add("{{ section }}-group")
             fieldDiv.classList.add("input-group")
             fieldDiv.classList.add("mb-1")
             fieldDiv.innerHTML = `
@@ -122,6 +136,7 @@
         })
         {% endfor %}   
     });
+
     </script>
 {% endblock %}
 
