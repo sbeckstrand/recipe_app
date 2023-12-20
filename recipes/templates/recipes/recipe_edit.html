@@ -18,14 +18,16 @@
                 {% if section == 'ingredient' %}
                     {% if ingredients %}
                         {% for key, ingredient_dict in ingredients.items %}
-                        <div class="input-group mb-1 ingredient-group">
+                        <div class="input-group mb-1">
+                            <span class="input-group-text sortable"><i class="fa fa-sort"></i></span>
                             <input class="textinput form-control w-50" value="{{ ingredient_dict.ingredient }}" type="text" name="dynamic-field-{{ section }}-{{ key }}" required>
                             <input class="textinput form-control" value="{{ ingredient_dict.measurement }}" type="text" name="dynamic-field-measurement-{{ key }}" required>
                             <button type="button" class="remove-field-{{ section }} btn btn-danger">Remove</button>
                         </div> 
                         {% endfor %}
                     {% else %}
-                    <div class="input-group mb-1 ingredient-group">
+                    <div class="input-group mb-1">
+                        <span class="input-group-text sortable"><i class="fa fa-sort"></i></span>
                         <input class="textinput form-control w-50" type="text" name="dynamic-field-{{ section }}-0" required>
                         <input class="textinput form-control" type="text" name="dynamic-field-measurement-0" required>
                         <button type="button" class="remove-field-{{ section }} btn btn-danger">Remove</button>
@@ -35,13 +37,15 @@
                 {% if section == 'instruction' %}
                     {% if instructions %}
                         {% for key, instruction in instructions.items %}
-                        <div class="input-group mb-1 instruction-group">
+                        <div class="input-group mb-1">
+                            <span class="input-group-text sortable"><i class="fa fa-sort"></i></span>
                             <textarea class="textarea form-control" rows="3" type="text" name="dynamic-field-{{ section }}-{{ key }}" required>{{ instruction.instruction }}</textarea>
                             <button type="button" class="remove-field-{{ section }} btn btn-danger">Remove</button>
                         </div>
                         {% endfor %}
                     {% else %}
-                    <div class="input-group mb-1 instruction-group">
+                    <div class="input-group mb-1">
+                        <span class="input-group-text sortable"><i class="fa fa-sort"></i></span>
                         <textarea class="textarea form-control" rows="3" type="text" name="dynamic-field-{{ section }}-0" required></textarea>
                         <button type="button" class="remove-field-{{ section }} btn btn-danger">Remove</button>
                     </div>
@@ -66,7 +70,7 @@
     {% for section in sections %}
     const {{ section }}Fields = document.getElementById('{{ section }}-formset');
     new Sortable({{ section }}Fields, {
-        handle: '.{{ section }}-group', // Define the handle for dragging
+        handle: '.sortable', // Define the handle for dragging
         animation: 450,
         onEnd: function (evt) {
             // Perform actions after drag and drop (e.g., update order)
@@ -103,6 +107,7 @@
             fieldDiv.classList.add("input-group")
             fieldDiv.classList.add("mb-1")
             fieldDiv.innerHTML = `
+                    <span class="input-group-text sortable"><i class="fa fa-sort"></i></span>
                     {% if section == 'ingredient' %}
                     <input class="textinput form-control w-50" type="text" name="dynamic-field-{{ section }}-${fieldCount{{section|title}}}" required>
                     <input class="textinput form-control" type="text" name="dynamic-field-measurement-${fieldCount{{section|title}}}" required>
