@@ -1,4 +1,4 @@
-<ul class="list-group">
+<ul class="pt-3 list-group">
     {% for recipe in recipes %}
         <li class="list-group-item">
             <a class="link-body-emphasis link-offset-2 link-underline-opacity-25 link-underline-opacity-75-hover" href="{% url 'recipe_detail' pk=recipe.pk %}">{{ recipe.title }}</a>

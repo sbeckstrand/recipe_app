@@ -2,14 +2,14 @@
 {% load crispy_forms_tags %}
 
 {% block content %}
-    <h2 class="py-2">{{ title }}</h2>
+    <h2 class="pt-3">{{ title }}</h2>
     <form id="dynamic-form" method="post">
         {% csrf_token %}
         {{ form.title|as_crispy_field }}
         {{ form.description|as_crispy_field }}
         
         {% for section in sections %}
-        <div id="{{ section }}-control" class="mb-3">
+        <div id="{{ section }}-control" class="mb-5">
             <label class="form-label">{{ section|title }}s</label>
             <div id="{{ section }}-formset">
                 <!-- Form fields will be added and removed dynamically here -->
@@ -123,7 +123,7 @@
         }
     
         // Event listener to add a new field when "Add Field" button is clicked
-        {{ section}}_formset.addEventListener('click', function(event) {
+        {{ section }}_formset.addEventListener('click', function(event) {
             if (event.target.classList.contains('remove-field-{{ section }}')) {
                 removeField{{ section|title }}(event);
             }

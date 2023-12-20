@@ -1,11 +1,16 @@
 {% extends "base.html" %}
+{% load custom_filters %}
+
 {% block content %}
-    <h2 class="py-2">{{ recipe.title }}</h2>
+    <h2 class="pt-2">{{ recipe.title }}</h2>
     
     <h5>Description</h5>
-    <p>{{ recipe.description|linebreaks }}</p>
-    
-    <h5 class="py-2">Ingredients</h5>
+    {% with recipe.description|remove_empty_lines as description %}
+        {% for section in description %}
+            <div>{{ section }}</div>
+        {% endfor %}
+    {% endwith %}
+    <h5 class="pt-4">Ingredients</h5>
     {% for key, ingredient_dict in ingredients.items %}
     <ul class="list-group list-group-horizontal w-100">
         <li class="list-group-item w-75">
@@ -17,7 +22,7 @@
     </ul>
     {% endfor %}
     
-    <h5 class="py-2">Instructions</h5>
+    <h5 class="pt-4">Instructions</h5>
     <ul class="list-group mb-3">
         {% for key, instruction in instructions.items %}
             <li class="list-group-item">
