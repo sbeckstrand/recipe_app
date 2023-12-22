@@ -11,9 +11,33 @@
         {% for section in sections %}
         <div id="{{ section }}-control" class="mb-5">
             <label class="form-label">{{ section|title }}s</label>
+            <div>
+                {% if section == 'detail' %}
+                    {% for key, detail in locked_details.items %}
+                    <div class="input-group mb-1">
+                        <span class="input-group-text w-50 unsortable">{{ detail.name }}</span>
+                        {% if detail.value != None %}
+                        <input class="textinput form-control" value="{{ detail.value }}" type="{{ detail.type }}" name="{{ key }}">
+                        {% else %}
+                        <input class="textinput form-control" value="" type="{{ detail.type }}" name="{{ key }}">
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                {% endif %}
+            </div>
             <div id="{{ section }}-formset">
-                <!-- Form fields will be added and removed dynamically here -->
-                <!-- Initially, you can have a single input field -->
+                {% if section == 'detail' %}
+                    {% if details %}
+                        {% for key, detail_dict in details.items %}
+                            <div class="input-group mb-1">
+                                <span class="input-group-text sortable"><i class="fa fa-sort"></i></span>
+                                <input class="textinput form-control" value="{{ detail_dict.name }}" type="text" name="dynamic-field-{{ section }}-{{ key }}" required>
+                                <input class="textinput form-control" value="{{ detail_dict.value }}" type="text" name="dynamic-field-value-{{ key }}" required>
+                                <button type="button" class="remove-field-{{ section }} btn btn-danger">Remove</button>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                {% endif %}
                 
                 {% if section == 'ingredient' %}
                     {% if ingredients %}
@@ -34,6 +58,7 @@
                     </div>
                     {% endif %}
                 {% endif %}
+
                 {% if section == 'instruction' %}
                     {% if instructions %}
                         {% for key, instruction in instructions.items %}
@@ -72,6 +97,9 @@
     new Sortable({{ section }}Fields, {
         handle: '.sortable', // Define the handle for dragging
         animation: 450,
+        onMove(evt) {
+            if (evt.related.classList.contains('unsortable')) return false;
+        },
         onEnd: function (evt) {
             // Perform actions after drag and drop (e.g., update order)
             const fieldOrder = Array.from({{ section }}Fields.children)
@@ -85,6 +113,14 @@
         {% for section in sections %}
         const {{ section }}_formset = document.getElementById('{{ section }}-formset');
         const {{ section }}_control = document.getElementById('{{ section }}-control');
+        {% if section == 'detail' %}
+            {% if detail_count %}
+            console.log("There is a detail count")
+            let fieldCountDetail = {{ detail_count }} + 2;
+            {% else %}
+            let fieldCountDetail = 1;
+            {% endif %}
+        {% endif %}
         {% if section == 'ingredient' %}
             {% if ingredient_count %}
             let fieldCountIngredient = {{ ingredient_count }} + 2;
@@ -108,10 +144,16 @@
             fieldDiv.classList.add("mb-1")
             fieldDiv.innerHTML = `
                     <span class="input-group-text sortable"><i class="fa fa-sort"></i></span>
+                    {% if section == 'detail' %}
+                        <input class="textinput form-control" type="text" name="dynamic-field-{{ section }}-${fieldCount{{ section|title }}}" required>
+                        <input class="textinput form-control" type="text" name="dynamic-field-value-${fieldCount{{ section|title }}}" required>
+                    {% endif %}
+
                     {% if section == 'ingredient' %}
                     <input class="textinput form-control w-50" type="text" name="dynamic-field-{{ section }}-${fieldCount{{section|title}}}" required>
                     <input class="textinput form-control" type="text" name="dynamic-field-measurement-${fieldCount{{section|title}}}" required>
                     {% endif %}
+
                     {% if section == 'instruction' %}
                     <textarea class="textarea form-control" rows="3" type="text" name="dynamic-field-{{ section }}-${fieldCount{{section|title}}}" required></textarea>
                     {% endif %}

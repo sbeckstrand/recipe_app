@@ -10,11 +10,42 @@
             <div>{{ section }}</div>
         {% endfor %}
     {% endwith %}
+
+    {% if has_details %}
+    <h5 class="pt-4">Details</h5>
+    {% endif %}
+    {% for key, detail in locked_details.items %}
+        {% if detail.value != None %}
+        <ul class="list-group list-group-horizontal w-100">
+            <li class="list-group-item w-50">
+                {{ detail.name }}
+            </li>
+            <li class="list-group-item w-50">
+                {{ detail.value }}
+            </li>
+        </ul>
+        {% endif %}
+    {% endfor %}
+    {% for key, detail in details.items %}
+    <ul class="list-group list-group-horizontal w-100">
+        <li class="list-group-item w-50">
+            {{ detail.name }}
+        </li>
+        <li class="list-group-item w-50">
+            {{ detail.value }}
+        </li>
+    </ul>
+    {% endfor %}
+    {% if recipe.source %}
+    <div class="mt-2">
+        <a href="{{ recipe.source }}" target="_blank" class="link-opacity-50-hover link-offset-2">Source</a>
+    </div>
+    {% endif %}
     <h5 class="pt-4">Ingredients</h5>
     {% for key, ingredient_dict in ingredients.items %}
     <ul class="list-group list-group-horizontal w-100">
         <li class="list-group-item w-75">
-            {{ ingredient_dict.ingredient}}
+            {{ ingredient_dict.ingredient }}
         </li>
         <li class="list-group-item w-25">
             {{ ingredient_dict.measurement }}
