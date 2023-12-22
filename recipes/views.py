@@ -19,11 +19,31 @@ def recipe_all(request):
 
 def recipe_detail(request, pk):
     recipe = get_object_or_404(Recipe, pk=pk)
+    if recipe.prep_time == "None":
+        print(recipe.prep_time)
+
+    has_details = False
+    if recipe.information != "{}":
+        has_details = True
+
+    for val in [recipe.servings, recipe.cals_per_serving, recipe.prep_time, recipe.cook_time, recipe.source]:
+        if val:
+            has_details = True
+            break
+
     context = {
         'recipe': recipe,
         'title': recipe.title,
+        'details': json.loads(recipe.information),
         'ingredients': json.loads(recipe.ingredients),
-        'instructions': json.loads(recipe.instructions)
+        'instructions': json.loads(recipe.instructions),
+        'has_details': has_details,
+        'locked_details': {
+            'servings': { 'name': 'Yield', 'value': recipe.servings },
+            'cals_per_serving': { 'name': 'Calories Per Serving', 'value': recipe.cals_per_serving },
+            'prep_time': { 'name': "Prep Time", 'value': recipe.prep_time },
+            'cook_time': { 'name': "Cook Time", 'value': recipe.cook_time }
+        }
     }
     return render(request, 'recipes/recipe_detail.html', context)
 
@@ -36,8 +56,20 @@ def recipe_new(request):
         if not form.is_valid():
             valid = False
         
+        cals_per_serv = request.POST.get('cals_per_serving')
+        prep_time = request.POST.get('prep_time')
+        cook_time = request.POST.get('cook_time')
+        servings = request.POST.get('servings')
+        source = request.POST.get('source')
+
         # Build ingredients and instructions JSON
-        ingredients, instructions = build_json_data(request)
+        details, ingredients, instructions = build_json_data(request)
+
+        # validate details
+        if details == "{}":
+            pass
+        elif not json.loads(details):
+            valid = False
 
         # validate ingredients
         if not json.loads(ingredients):
@@ -50,6 +82,23 @@ def recipe_new(request):
         # If all validation passes, Create Recipe
         if valid: 
             recipe = form.save(commit=False)
+
+            if cals_per_serv:
+                recipe.cals_per_serving = cals_per_serv
+
+            if prep_time:
+                recipe.prep_time = prep_time
+
+            if cook_time:
+                recipe.cook_time = cook_time
+
+            if servings:
+                recipe.servings = servings
+
+            if source:
+                recipe.source = source
+
+            recipe.information = details
             recipe.ingredients = ingredients
             recipe.instructions = instructions
             recipe.save()
@@ -60,7 +109,14 @@ def recipe_new(request):
     context = {
         'form': form,
         'title': "New Recipe",
-        'sections': ['ingredient', 'instruction']
+        'locked_details': {
+            'servings': { 'name': 'Yield', 'value': '', 'type': 'text' },
+            'cals_per_serving': { 'name': 'Calories Per Serving', 'value': '', 'type': 'number' },
+            'prep_time': { 'name': "Prep Time", 'value': '', 'type': 'text' },
+            'cook_time': { 'name': "Cook Time", 'value': '', 'type': 'text' },
+            'source': { 'name': "Source", 'value': '', 'type': 'url'}
+        },
+        'sections': ['detail', 'ingredient', 'instruction'],
     }
     return render(request, 'recipes/recipe_edit.html', context)
 
@@ -75,8 +131,20 @@ def recipe_edit(request, pk):
         if not form.is_valid():
             valid = False
         
+        cals_per_serv = request.POST.get('cals_per_serving')
+        prep_time = request.POST.get('prep_time')
+        cook_time = request.POST.get('cook_time')
+        servings = request.POST.get('servings')
+        source = request.POST.get('source')
+
         # Build ingredients and instructions JSON
-        ingredients, instructions = build_json_data(request)
+        details, ingredients, instructions = build_json_data(request)
+
+        # validate details
+        if details == "{}":
+            pass
+        elif not json.loads(details):
+            valid = False
 
         # validate ingredients
         if not json.loads(ingredients):
@@ -89,6 +157,33 @@ def recipe_edit(request, pk):
         # If all validation passes, Update Recipe
         if valid: 
             recipe = form.save(commit=False)
+
+            if cals_per_serv:
+                recipe.cals_per_serving = cals_per_serv
+            else:
+                recipe.cals_per_serving = None
+
+            if prep_time:
+                recipe.prep_time = prep_time
+            else:
+                recipe.prep_time = None
+
+            if cook_time:
+                recipe.cook_time = cook_time
+            else:
+                 recipe.cook_time = None
+
+            if servings:
+                recipe.servings = servings
+            else:
+                recipe.servings = None
+
+            if source:
+                recipe.source = source
+            else:
+                recipe.source = None
+
+            recipe.information = details
             recipe.ingredients = ingredients
             recipe.instructions = instructions
             recipe.save()
@@ -101,9 +196,18 @@ def recipe_edit(request, pk):
         'recipe': recipe,
         'form': form,
         'title': f'{ recipe.title } - Edit',
-        'sections': ['ingredient', 'instruction'],
+        'sections': ['detail', 'ingredient', 'instruction'],
+        'locked_details': {
+            'servings': { 'name': 'Yield', 'value': recipe.servings, 'type': 'text' },
+            'cals_per_serving': { 'name': 'Calories Per Serving', 'value': recipe.cals_per_serving, 'type': 'number' },
+            'prep_time': { 'name': "Prep Time", 'value': recipe.prep_time, 'type': 'text' },
+            'cook_time': { 'name': "Cook Time", 'value': recipe.cook_time, 'type': 'text' },
+            'source': { 'name': "Source", 'value': recipe.source, 'type': 'url'}
+        },
+        'details': json.loads(recipe.information),
         'ingredients': json.loads(recipe.ingredients),
         'instructions': json.loads(recipe.instructions),
+        'detail_count': len(json.loads(recipe.information)),
         'ingredient_count': len(json.loads(recipe.ingredients)),
         'instruction_count': len(json.loads(recipe.instructions))
 
@@ -113,13 +217,20 @@ def recipe_edit(request, pk):
 # Edit/New Helper function
 def build_json_data(request):
     # Build instructions and ingredients JSON
+    details = {}
+    detail_count = 0
     ingredients = {}
     ing_count = 0
     instructions = {}
     ins_count = 0
 
     for key, val in request.POST.items():
-        if 'dynamic-field-ingredient' in key:
+        if 'dynamic-field-detail' in key:
+            details[str(detail_count)] = {'name': val.strip()}
+            detail_index = key.split('-')[-1]
+            details[str(detail_count)]['value'] = request.POST[f'dynamic-field-value-{ detail_index }']
+            detail_count += 1
+        elif 'dynamic-field-ingredient' in key:
             ingredients[str(ing_count)] = {'ingredient': val.strip()}
             ing_index = key.split('-')[-1]
             ingredients[str(ing_count)]['measurement'] = request.POST[f'dynamic-field-measurement-{ ing_index }']
@@ -127,11 +238,14 @@ def build_json_data(request):
         elif 'dynamic-field-instruction' in key:
             instructions[str(ins_count)] = {'instruction': val.strip()}
             ins_count += 1
-    
+    if details == {}:
+        details = str("{}")
+    else:
+        details = json.dumps(details)
     ingredients = json.dumps(ingredients)
     instructions = json.dumps(instructions)
 
-    return ingredients, instructions
+    return details, ingredients, instructions
 
 @login_required
 def recipe_delete(request, pk):
