@@ -20,11 +20,10 @@ RUN pipenv install --deploy --system
 # Copy the Django application code into the container
 COPY . /app/
 
-# Make migrations
-RUN python manage.py makemigrations
+# Setup Entrypoint script to make and apply migraitons
+COPY entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+ENTRYPOINT ["/entrypoint.sh"]
 
-# Apply migrations
-RUN python manage.py migrate
-
-# Run the Django application
-RUN python manage.py runserver 0.0.0.0:8000
+# Run Django App
+CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
