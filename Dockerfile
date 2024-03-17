@@ -19,3 +19,12 @@ RUN pipenv install --deploy --system
 
 # Copy the Django application code into the container
 COPY . /app/
+
+# Make migrations
+RUN python manage.py makemigrations
+
+# Apply migrations
+python manage.py migrate
+
+# Run the Django application
+python manage.py runserver 0.0.0.0:8000
