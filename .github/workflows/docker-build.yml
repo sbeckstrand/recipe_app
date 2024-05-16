@@ -48,7 +48,6 @@ jobs:
       uses: actions/checkout@v2
       with:
         repository: sbeckstrand/k8s-apps
-        token: ${{ secrets.K8S_APPS_PAT }}
         path: k8s-apps
     
     - name: Update Image Tag
@@ -63,5 +62,3 @@ jobs:
         git add apps/recipe-app/values-image.yaml
         git commit -m "Update image tag to ${{ env.SHORT_SHA }}"
         git push
-      env:
-        GITHUB_TOKEN: ${{ secrets.K8S_APPS_PAT }}
