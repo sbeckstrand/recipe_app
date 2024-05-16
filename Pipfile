@@ -8,6 +8,7 @@ django = "*"
 python-dotenv = "*"
 django-crispy-forms = "*"
 crispy-bootstrap5 = "*"
+django-allow-cidr = "*"
 
 [dev-packages]
 
