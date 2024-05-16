@@ -49,6 +49,7 @@ jobs:
       with:
         repository: sbeckstrand/k8s-apps
         path: k8s-apps
+        ref: main
     
     - name: Update Image Tag
       run: |
