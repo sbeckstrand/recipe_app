@@ -45,11 +45,12 @@ jobs:
       run: echo "SHORT_SHA=$(echo $GITHUB_SHA | cut -c1-7)" >> $GITHUB_ENV
 
     - name: Checkout k8s-apps Repository
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
       with:
         repository: sbeckstrand/k8s-apps
         path: k8s-apps
         ref: main
+        token: ${{ secrets.K8S_APPS_PAT }}
     
     - name: Update Image Tag
       run: |
