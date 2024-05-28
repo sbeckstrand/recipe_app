@@ -34,9 +34,9 @@ SECRET_KEY = os.environ['SECRET_KEY']
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = os.environ['DJANGO_ALLOWED_HOSTS'].split(',')
 
-ALLOWED_CIDR_NETS = ['192.168.3.0/24']
+ALLOWED_CIDR_NETS = []
 
 
 # Application definition
